@@ -1,11 +1,15 @@
 <?php
 namespace JTSK;
 
-/*
-http://www.geospeleos.com/Mapovani/WGS84toSJTSK/WGS84toSJTSK.htm
-Jakub.Kerhat@seznam.cz
-*/
-
+/**
+ * Class Converter
+ * @package JTSK
+ *
+ * JTSK coordinates converter
+ * This is a PHP port of Pascal code that was originally published at
+ * http://www.geospeleos.com/Mapovani/WGS84toSJTSK/WGS84toSJTSK.htm
+ * Original author: Jakub Kerhat
+ */
 class Converter {
 
     const EPS = 1e-4; // relativni presnost
