@@ -215,8 +215,3 @@ class Converter {
         return array($xn, $yn, $zn);
     }
 }
-
-$c = new Converter();
-var_dump($c->JTSKtoWGS84(1104335.13, 707849.38));
-var_dump($c->WGS84toJTSK(49.582556081943,15.015852481984));
-
