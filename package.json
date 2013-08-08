@@ -1,0 +1,15 @@
+{
+    "author": "Josef Zamrzla",
+    "name": "JTSK_Converter",
+    "version": "0.0.1",
+    "engines": {
+        "node": "~0.10"
+    },
+    "dependencies": {
+        "grunt": "~0.4.1",
+        "grunt-contrib-jshint": "~0.4.0",
+        "jshint": "~1.1.0",
+        "grunt-cli": "~0.1.0"
+
+    }
+}

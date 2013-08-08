@@ -78,7 +78,7 @@ class Converter {
             $delta *= 0.55;
             $steps += 4;
 
-        } while (!($delta < 0.00001) or ($steps > 1000));
+        } while (!(($delta < 0.00001) || ($steps > 1000)));
 
         return array('lat' => $latitude, 'lon' => $longitude);
 
@@ -92,7 +92,7 @@ class Converter {
             return array('x' => 0, 'y' => 0);
         } else {
             list($latitude, $longitude) = $this->WGS84toBessel($latitude, $longitude);
-            return $this->BesseltoJtsk($latitude, $longitude);
+            return $this->BesseltoJTSK($latitude, $longitude);
         }
     }
 
