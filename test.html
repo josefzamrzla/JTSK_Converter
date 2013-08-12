@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <script type="text/javascript" src="http://api4.mapy.cz/loader.js"></script>
+    <script type="text/javascript">Loader.load();</script>
+    <script type="text/javascript" src="./Converter.js"></script>
+</head>
+
+<body>
+
+<div>
+
+    <h1>Difference between JTSK_Converter algorithm and Mapy.cz algorithm</h1>
+    <select id="selectAddress" onchange="zoomTo(this.value)">
+        <option value="-1">select address</option>
+    </select>
+
+</div>
+
+<div style="width:500px;float:left;margin:10px;">
+    <strong>JTSK_Converter</strong>
+    <p>JTSK to WGS-84 conversion first, then WGS-84 coordinates projection</p>
+    <div id="m" style="width:500px;height:500px;"></div>
+</div>
+<div style="width:500px;float:left;margin:10px;">
+    <strong>Mapy.cz</strong>
+    <p>
+        Internal JTSK to WGS-84 conversion by SMap.Coords.fromJTSK
+    </p>
+    <div id="m2" style="width:500px;height:500px;"></div>
+</div>
+
+<script type="text/javascript">
+    var addresses = [
+        {
+            address: "Kosmická 739/5, Praha 4",
+            x: 1050242.27,
+            y: 735765.68
+        },
+        {
+            address: "Lipovická 143/19, Praha 4",
+            x: 1053432.57,
+            y: 740992.28
+        },
+        {
+            address: "U Pernikářky 1520/11, Praha 5",
+            x: 1044000.00,
+            y: 745909.00
+        },
+        {
+            address: "Svatavina 513/8, Praha 6",
+            x: 1041469.00,
+            y: 750057.00
+        },
+        {
+            address: "Šaldova 545/4, Praha 8",
+            x: 1042826.40,
+            y: 740251.40
+        },
+        {
+            address: "Splavná 996, Praha 9",
+            x: 1041692.68,
+            y: 732470.58
+        },
+        {
+            address: "Vrátkovská 2070/4, Praha 10",
+            x: 1044813.90,
+            y: 737591.71
+        },
+        {
+            address: "Kazín 173, Praha 5",
+            x: 1057512.37,
+            y: 750000.66
+        },
+        {
+            address: "Kamencová 593, Praha 9",
+            x: 1044698.00,
+            y: 733166.00
+        },
+        {
+            address: "Písnice 577, Praha 4",
+            x: 1054440.71,
+            y: 740892.17
+        }
+
+    ];
+
+
+    var selectElm = document.getElementById('selectAddress');
+
+    for (var i = 0; i < addresses.length; i++){
+        var opt = document.createElement('option');
+        opt.value = i;
+        opt.innerHTML = addresses[i].address;
+        selectElm.appendChild(opt);
+    }
+
+    // initial display
+    selectElm.value = 0;
+    zoomTo(0);
+
+    function showMap (mapId, jtskX, jtskY, useConvertor)
+    {
+        var center;
+        if (useConvertor) {
+            var conv = new JTSK_Converter();
+            var wgs = conv.JTSKtoWGS84(jtskX, jtskY);
+            center = SMap.Coords.fromWGS84(wgs.lon, wgs.lat);
+        } else {
+            center = SMap.Coords.fromJTSK(jtskX, jtskY);
+        }
+
+        var m = new SMap(JAK.gel(mapId), center, 16);
+        m.addDefaultLayer(SMap.DEF_BASE).enable();
+        m.addDefaultControls();
+
+        var layer = new SMap.Layer.Marker();
+        m.addLayer(layer);
+        layer.enable();
+
+        var options = {};
+        var marker = new SMap.Marker(center, "myMarker", options);
+        layer.addMarker(marker);
+    }
+
+    function zoomTo (adId)
+    {
+        if (adId < 0) return;
+
+        var jtsk = addresses[adId];
+        showMap("m", jtsk.x, jtsk.y, true);
+        showMap("m2", jtsk.x, jtsk.y, false);
+    }
+</script>
+
+</body>
+</html>
