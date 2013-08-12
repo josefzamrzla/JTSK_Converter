@@ -4,6 +4,7 @@ namespace JTSK;
 /**
  * Class Converter
  * @package JTSK
+ * @author Josef Zamrzla
  *
  * JTSK coordinates converter
  * This is a PHP port of Pascal code that was originally published at
@@ -12,9 +13,15 @@ namespace JTSK;
  */
 class Converter {
 
-    const EPS = 1e-4; // relativni presnost
+    const EPS = 1e-4; // relative accuracy
 
-    // zpetna konverze z JTSK do WGS84 (pomoci iterace - pomalejsi)
+    /**
+     * Conversion from JTSK to WGS-84 (by iteration)
+     *
+     * @param $x
+     * @param $y
+     * @return array
+     */
     public function JTSKtoWGS84($x, $y)
     {
         if (!($x && $y)) {
@@ -84,8 +91,13 @@ class Converter {
 
     }
 
-    // vraci JTSK souradnice pro zadanou severni sirku a vychodni delku
-    // zminenou GPS v souradnem systemu elipsoidu WGS84
+    /**
+     * Conversion from WGS-84 to JTSK
+     *
+     * @param $latitude
+     * @param $longitude
+     * @return array
+     */
     public function WGS84toJTSK($latitude, $longitude)
     {
         if (($latitude < 40) || ($latitude > 60) || ($longitude < 5) || ($longitude > 25)) {
@@ -96,7 +108,14 @@ class Converter {
         }
     }
 
-    // konverze z elipsoidu WGS84 do Besselova elipsoidu bez Ferra
+    /**
+     * Conversion from ellipsoid WGS-84 to Bessel's ellipsoid
+     *
+     * @param $latitude
+     * @param $longitude
+     * @param int $altitude
+     * @return array
+     */
     public function WGS84toBessel($latitude, $longitude, $altitude = 0)
     {
         $B = deg2rad($latitude);
@@ -114,8 +133,13 @@ class Converter {
         return array($latitude, $longitude);
     }
 
-    // vraci JTSK souradnice pro zadanou Severni sirku a vychodni delku
-    // neni treba odecitat Ferro
+    /**
+     * Conversion from Bessel's lat/lon to WGS-84
+     *
+     * @param $latitude
+     * @param $longitude
+     * @return array
+     */
     public function BesseltoJTSK($latitude, $longitude)
     {
         $a     = 6377397.15508;
@@ -155,10 +179,17 @@ class Converter {
         return array('x' => $rho * cos($eps), 'y' => $rho * sin($eps));
     }
 
-    // vypocet pravouhlych souradnic z geodetickych souradnic
+    /**
+     * Conversion from geodetic coordinates to Cartesian coordinates
+     *
+     * @param $B
+     * @param $L
+     * @param $H
+     * @return array
+     */
     public function BLHToGeoCoords($B, $L, $H)
     {
-        // parametry elipsoidu WGS-84
+        // WGS-84 ellipsoid parameters
         $a   = 6378137.0;
         $f_1 = 298.257223563;
         $e2  = 1 - pow(1 - 1 / $f_1, 2);
@@ -170,10 +201,18 @@ class Converter {
         return array($x, $y, $z);
     }
 
-    // vypocet geodetickych souradnic z pravouhlych souradnic
+    /**
+     * Conversion from Cartesian coordinates to geodetic coordinates
+     *
+     * @param $x
+     * @param $y
+     * @param $z
+     * @return array
+     */
     public function geoCoordsToBLH($x, $y, $z)
     {
-        $a   = 6377397.15508;  // parametry Besselova elipsoidu
+        // Bessel's ellipsoid parameters
+        $a   = 6377397.15508;
         $f_1 = 299.152812853;
         $a_b = $f_1 / ($f_1-1);
         $p   = sqrt(pow($x, 2) + pow($y, 2));
@@ -190,6 +229,14 @@ class Converter {
         return array($B, $L, $H);
     }
 
+    /**
+     * Distance between two points
+     * @param $x1
+     * @param $y1
+     * @param $x2
+     * @param $y2
+     * @return float|int
+     */
     private function distPoints($x1, $y1, $x2, $y2)
     {
         $dist = hypot($x1 - $x2, $y1 - $y2);
@@ -200,13 +247,20 @@ class Converter {
         return $dist;
     }
 
-    // transformace pravouhlych souradnic
+    /**
+     * Coordinates transformation
+     *
+     * @param $xs
+     * @param $ys
+     * @param $zs
+     * @return array
+     */
     private function transformCoords($xs, $ys, $zs)
     {
-        // koeficienty transformace ze systemu WGS-84 do systemu S-JTSK
-        $dx = -570.69; $dy = -85.69; $dz = -462.84; //{posunuti}
-        $wx = 4.99821/3600 * pi() / 180; $wy = 1.58676/3600 * pi() / 180; $wz = 5.2611/3600 * pi() / 180; //{rotace}
-        $m  = -3.543e-6; // {meritko}
+        // coeficients of transformation from WGS-84 to JTSK
+        $dx = -570.69; $dy = -85.69; $dz = -462.84; // shift
+        $wx = 4.99821/3600 * pi() / 180; $wy = 1.58676/3600 * pi() / 180; $wz = 5.2611/3600 * pi() / 180; // rotation
+        $m  = -3.543e-6; // scale
 
         $xn = $dx + (1 + $m) * (+$xs + $wz * $ys - $wy * $zs);
         $yn = $dy + (1 + $m) * (-$wz * $xs + $ys + $wx * $zs);

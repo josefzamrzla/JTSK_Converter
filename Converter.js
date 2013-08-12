@@ -3,6 +3,7 @@
 
     /**
      * Class JTSK_Converter
+     * @author Josef Zamrzla
      *
      * JTSK coordinates converter
      * This is a Javascript port of Pascal code that was originally published at
@@ -12,6 +13,14 @@
 
     var JTSK_Converter = function () {
 
+        /**
+         * Calculate distance between two points
+         * @param x1
+         * @param y1
+         * @param x2
+         * @param y2
+         * @returns {*}
+         */
         this.distPoints = function (x1, y1, x2, y2)
         {
             var dist = this.hypot(x1 - x2, y1 - y2);
@@ -22,13 +31,19 @@
             return dist;
         };
 
-        // transformace pravouhlych souradnic
+        /**
+         * Coordinates transformation
+         * @param xs
+         * @param ys
+         * @param zs
+         * @returns {Array}
+         */
         this.transformCoords = function (xs, ys, zs)
         {
-            // koeficienty transformace ze systemu WGS-84 do systemu S-JTSK
-            var dx = -570.69, dy = -85.69, dz = -462.84; //{posunuti}
-            var wx = 4.99821/3600 * Math.PI / 180, wy = 1.58676/3600 * Math.PI / 180, wz = 5.2611/3600 * Math.PI / 180; //{rotace}
-            var m  = -3.543e-6; // {meritko}
+            // coeficients of transformation from WGS-84 to JTSK
+            var dx = -570.69, dy = -85.69, dz = -462.84; // shift
+            var wx = 4.99821/3600 * Math.PI / 180, wy = 1.58676/3600 * Math.PI / 180, wz = 5.2611/3600 * Math.PI / 180; // rotation
+            var m  = -3.543e-6; // scale
 
             var xn = dx + (1 + m) * (+xs + wz * ys - wy * zs);
             var yn = dy + (1 + m) * (-wz * xs + ys + wx * zs);
@@ -52,9 +67,14 @@
 
     };
 
-    JTSK_Converter.prototype.EPS = 1e-4; // relativni presnost
+    JTSK_Converter.prototype.EPS = 1e-4; // relative accuracy
 
-    // zpetna konverze z JTSK do WGS84 (pomoci iterace - pomalejsi)
+    /**
+     * Conversion from JTSK to WGS-84 (by iteration)
+     * @param x
+     * @param y
+     * @returns {{lat: number, lon: number}}
+     */
     JTSK_Converter.prototype.JTSKtoWGS84 = function (x, y)
     {
         if (!(x && y)) {
@@ -125,8 +145,12 @@
         return {'lat': latitude, 'lon': longitude};
     };
 
-    // vraci JTSK souradnice pro zadanou severni sirku a vychodni delku
-    // zminenou GPS v souradnem systemu elipsoidu WGS84
+    /**
+     * Conversion from WGS-84 to JTSK
+     * @param latitude
+     * @param longitude
+     * @returns {{x: number, y: number}}
+     */
     JTSK_Converter.prototype.WGS84toJTSK = function (latitude, longitude)
     {
         if ((latitude < 40) || (latitude > 60) || (longitude < 5) || (longitude > 25)) {
@@ -137,7 +161,13 @@
         }
     };
 
-    // konverze z elipsoidu WGS84 do Besselova elipsoidu bez Ferra
+    /**
+     * Conversion from ellipsoid WGS-84 to Bessel's ellipsoid
+     * @param latitude
+     * @param longitude
+     * @param altitude
+     * @returns {Array}
+     */
     JTSK_Converter.prototype.WGS84toBessel = function (latitude, longitude, altitude)
     {
         var B = this.deg2rad(latitude);
@@ -155,8 +185,12 @@
         return [latitude, longitude];
     };
 
-    // vraci JTSK souradnice pro zadanou Severni sirku a vychodni delku
-    // neni treba odecitat Ferro
+    /**
+     * Conversion from Bessel's lat/lon to WGS-84
+     * @param latitude
+     * @param longitude
+     * @returns {{x: number, y: number}}
+     */
     JTSK_Converter.prototype.BesseltoJTSK = function (latitude, longitude)
     {
         var a     = 6377397.15508;
@@ -196,10 +230,16 @@
         return {'x': rho * Math.cos(eps), 'y': rho * Math.sin(eps)};
     };
 
-    // vypocet pravouhlych souradnic z geodetickych souradnic
+    /**
+     * Conversion from geodetic coordinates to Cartesian coordinates
+     * @param B
+     * @param L
+     * @param H
+     * @returns {Array}
+     */
     JTSK_Converter.prototype.BLHToGeoCoords = function (B, L, H)
     {
-        // parametry elipsoidu WGS-84
+        //  WGS-84 ellipsoid parameters
         var a   = 6378137.0;
         var f_1 = 298.257223563;
         var e2  = 1 - Math.pow(1 - 1 / f_1, 2);
@@ -211,10 +251,17 @@
         return [x, y, z];
     };
 
-    // vypocet geodetickych souradnic z pravouhlych souradnic
+    /**
+     * Conversion from Cartesian coordinates to geodetic coordinates
+     * @param x
+     * @param y
+     * @param z
+     * @returns {Array}
+     */
     JTSK_Converter.prototype.geoCoordsToBLH = function (x, y, z)
     {
-        var a   = 6377397.15508;  // parametry Besselova elipsoidu
+        // Bessel's ellipsoid parameters
+        var a   = 6377397.15508;
         var f_1 = 299.152812853;
         var a_b = f_1 / (f_1-1);
         var p   = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
