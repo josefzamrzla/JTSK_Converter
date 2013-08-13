@@ -11,30 +11,20 @@
 
 <div>
 
-    <h1>Difference between JTSK_Converter algorithm and Mapy.cz algorithm</h1>
-    <select id="selectAddress" onchange="zoomTo(this.value)">
+    <h1>JTSK_Converter test page</h1>
+    <select id="selectAddress" onchange="showMap(this.value)">
         <option value="-1">select address</option>
     </select>
 
 </div>
 
-<div style="width:500px;float:left;margin:10px;">
-    <strong>JTSK_Converter</strong>
-    <p>JTSK to WGS-84 conversion first, then WGS-84 coordinates projection</p>
-    <div id="m" style="width:500px;height:500px;"></div>
-</div>
-<div style="width:500px;float:left;margin:10px;">
-    <strong>Mapy.cz</strong>
-    <p>
-        Internal JTSK to WGS-84 conversion by SMap.Coords.fromJTSK
-    </p>
-    <div id="m2" style="width:500px;height:500px;"></div>
-</div>
+<div id="m" style="width:500px;height:500px;"></div>
 
 <script type="text/javascript">
 
-    // some random Prague addresses from cuzk.cz
+    // some random addresses from cuzk.cz
     var addresses = [
+        // Prague
         {
             address: "Kosmická 739/5, Praha 4",
             x: 1050242.27,
@@ -84,34 +74,60 @@
             address: "Písnice 577, Praha 4",
             x: 1054440.71,
             y: 740892.17
+        },
+        // Brno
+        {
+            address: "Hlinky 148/76, Brno",
+            x: 1161143.55,
+            y: 599939.33
+        },
+        {
+            address: "Zeiberlichova 75/34, Brno",
+            x: 1154445.35,
+            y: 596395.86
+        },
+        {
+            address: "Gellnerova 567/39, Brno",
+            x: 1158865.60,
+            y: 602047.20
+        },
+        {
+            address: "Podzimní 666/30, Brno",
+            x: 1158075.00,
+            y: 594489.81
+        },
+        {
+            address: "Pivodova 282/11, Brno",
+            x: 1163700.01,
+            y: 592739.78
+        },
+        {
+            address: "Touškova 981/10, Brno",
+            x: 1159891.38,
+            y: 595666.06
+        },
+        {
+            address: "Mečířova 1760/2, Brno",
+            x: 1157608.02,
+            y: 599407.89
+        },
+        {
+            address: "Křivánky 710/34, Brno",
+            x: 1162003.92,
+            y: 603264.60
         }
     ];
 
-    var selectElm = document.getElementById('selectAddress');
-
-    for (var i = 0; i < addresses.length; i++){
-        var opt = document.createElement('option');
-        opt.value = i;
-        opt.innerHTML = addresses[i].address;
-        selectElm.appendChild(opt);
-    }
-
-    // initial display
-    selectElm.value = 0;
-    zoomTo(0);
-
-    function showMap (mapId, jtskX, jtskY, useConvertor)
+    function showMap (adId)
     {
-        var center;
-        if (useConvertor) {
-            var conv = new JTSK_Converter();
-            var wgs = conv.JTSKtoWGS84(jtskX, jtskY);
-            center = SMap.Coords.fromWGS84(wgs.lon, wgs.lat);
-        } else {
-            center = SMap.Coords.fromJTSK(jtskX, jtskY);
-        }
+        var jtsk = addresses[adId];
+        if (!(jtsk.x && jtsk.y)) return;
 
-        var m = new SMap(JAK.gel(mapId), center, 16);
+        var conv = new JTSK_Converter();
+        var wgs = conv.JTSKtoWGS84(jtsk.x, jtsk.y);
+        var center = SMap.Coords.fromWGS84(wgs.lon, wgs.lat);
+
+        var m = new SMap(JAK.gel("m"), center, 16);
         m.addDefaultLayer(SMap.DEF_BASE).enable();
         m.addDefaultControls();
 
@@ -124,14 +140,20 @@
         layer.addMarker(marker);
     }
 
-    function zoomTo (adId)
-    {
-        if (adId < 0) return;
+    setTimeout(function () {
+        var selectElm = document.getElementById('selectAddress');
 
-        var jtsk = addresses[adId];
-        showMap("m", jtsk.x, jtsk.y, true);
-        showMap("m2", jtsk.x, jtsk.y, false);
-    }
+        for (var i = 0; i < addresses.length; i++){
+            var opt = document.createElement('option');
+            opt.value = i;
+            opt.innerHTML = addresses[i].address;
+            selectElm.appendChild(opt);
+        }
+
+        // initial display
+        selectElm.value = 0;
+        showMap(0);
+    });
 </script>
 
 </body>
