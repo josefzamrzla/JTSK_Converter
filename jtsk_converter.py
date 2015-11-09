@@ -20,7 +20,6 @@ class JtskConverter:
         steps = 0
 
         while True:
-            print steps, latitude, longitude
             jtsk = self.wgs84_to_jtsk(latitude - delta, longitude - delta)
             if jtsk['x'] and jtsk['y']:
                 v1 = self.dist_points(jtsk['x'], jtsk['y'], x, y)
