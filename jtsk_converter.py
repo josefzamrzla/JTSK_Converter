@@ -2,7 +2,7 @@ import math
 import numpy
 
 
-class JtskCoverter:
+class JtskConverter:
 
     EPS = 1.0e-4  # relative accuracy
 
@@ -170,7 +170,7 @@ class JtskCoverter:
     @staticmethod
     def dist_points(x1, y1, x2, y2):
         dist = math.hypot(x1 - x2, y1 - y2)
-        if dist < JtskCoverter.EPS:
+        if dist < JtskConverter.EPS:
             return 0.0
 
         return dist

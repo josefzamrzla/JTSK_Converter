@@ -4,7 +4,7 @@
 ### Conversion example in Python
 
 ```python
-converter = JtskCoverter()
+converter = JtskConverter()
 latlon = converter.jtsk_to_wgs84(1104335.13, 707849.38)  # returns dict {'lat', 'lon'}
 jtsk = converter.wgs84_to_jtsk(49.582556081943, 15.015852481984)  # returns dict {'x', 'y'}
 ```
